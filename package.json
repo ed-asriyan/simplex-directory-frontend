@@ -14,7 +14,7 @@
 	},
 	"devDependencies": {
 		"@castlenine/svelte-qrcode": "^2.2.0",
-		"@sentry/svelte": "^8.30.0",
+		"@sentry/svelte": "^8.33.1",
 		"@supabase/supabase-js": "^2.45.4",
 		"@sveltejs/vite-plugin-svelte": "^3.1.1",
 		"@tsconfig/svelte": "^5.0.2",
