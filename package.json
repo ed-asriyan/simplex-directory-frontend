@@ -15,7 +15,9 @@
 	"devDependencies": {
 		"@castlenine/svelte-qrcode": "^2.2.0",
 		"@sentry/svelte": "^9.40.0",
+		"@supabase/sql-to-rest": "^0.1.8",
 		"@supabase/supabase-js": "^2.55.0",
+		"@svar-ui/svelte-filter": "^2.3.0",
 		"@sveltejs/vite-plugin-svelte": "^6.2.1",
 		"@tsconfig/svelte": "^5.0.2",
 		"@types/d3": "^7.4.3",

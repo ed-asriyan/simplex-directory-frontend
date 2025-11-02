@@ -6,12 +6,14 @@
     import TableHeader from './table-header.svelte';
     import TableRow from './table-row.svelte';
     import Icon from '../icon.svelte';
+    import FilterComponent from './filter.svelte';
     import { QueryStore, QueryStoreList } from '../../query-store';
     import type { CountriesStore } from '../../store/countries-store';
     import type { ServerStatusesStore } from '../../store/server-statuses-store';
     import type { ServerStatusesService } from '../../store/server-statuses-service';
     import { labelsStore } from '../../store/labels-store';
     import { exportFile, importFile } from '../../utils';
+    import type { FilterValue } from '../../store/supabase-filter-converter';
 
     interface Props {
         serversStore: ServersStore;
@@ -40,25 +42,28 @@
 
     let serversPromise: Promise<void> = $state(Promise.resolve());
 
+    let filters: FilterValue = $state({
+        "glue": "or",
+        "rules": [
+            // {
+            // "field": "country",
+            // "includes": [
+            //     "AE",
+            //     "AU"
+            // ]
+            // },
+            {
+            "field": "host",
+            "filter": "contains",
+            "value": "asriyan",
+            "type": "text",
+            "includes": []
+            }
+        ]
+    });
+
     const sortField = new QueryStore<SortField>('filter-sort-column', 'lastCheck', ['status', 'lastCheck', 'uptime7', 'uptime30', 'uptime90']);
     const sortOrder = new QueryStore<SortOrder>('filter-sort-direction', 'desc', ['asc', 'desc']);
-
-    let sort: Sort = $derived({
-        field: $sortField || 'lastCheck',
-        order: $sortOrder || 'desc',
-    });
-    let filter: Filter = $state({
-        uuids: null,
-        protocol: 'smp',
-        infoPageAvailable: null,
-        identity: null,
-        host: '',
-        countries: null,
-        status: true,
-        uptime7: null,
-        uptime30: null,
-        uptime90: null,
-    });
 
     const refresh = function () {
         if (!isFinite(pageSize)) {
@@ -68,14 +73,18 @@
             pageNumber = 1;
         }
         serversPromise = serversService
-            .fetch(filter, sort, pageSize, pageNumber)
+            .fetchQuery(
+                filters,
+                pageSize,
+                pageNumber,
+            )
             .then(uuids => { currentPageServersUuids = uuids; });
     };
 
     $effect(() => refresh());
 
     $effect(() => {
-        if (filter) {
+        if (filters) {
             pageNumber = 1;
         }
     });
@@ -119,7 +128,11 @@
     };
 </script>
 
+<pre>{JSON.stringify(filters, null, 2)}</pre>
+
 <ServerModal bind:servers={serversModal} {serverStatusesStore} {serverStatusesService} />
+
+<FilterComponent countries={$countries} bind:filters={filters} />
 
 <div class="uk-margin-small-bottom">
     <button class="uk-button uk-button-default uk-margin-small-right uk-width-auto@m uk-width-1-1" onclick={importLabels}>
@@ -170,11 +183,11 @@
         </select>
     </div>
     <table class="table uk-table uk-table-divider uk-table-small">
-        <TableHeader
+        <!-- <TableHeader
             bind:filter={filter}
             onAllServerSelected={value => $selectedServersUuid = value ? currentPageServersUuids : []}
             countries={$countries}
-        />
+        /> -->
 
         <tbody class="uk-list-striped uk-table-hover">
             {#each currentPageServers as server (server.uuid)}

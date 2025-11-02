@@ -7,4 +7,9 @@ export default defineConfig({
         svelte(),
     ],
     publicDir: './static',
+    // https://github.com/supabase-community/sql-to-rest/issues/2#issuecomment-2295227359
+    optimizeDeps: {
+      exclude: ['@supabase/sql-to-rest'],
+    },
+    assetsInclude: ['**/*.wasm'],
 })

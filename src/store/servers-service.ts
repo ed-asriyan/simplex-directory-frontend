@@ -1,33 +1,35 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { renderSupabaseJs, type Filter, type Sort } from '@supabase/sql-to-rest';
 import type { Server, ServersStore } from './servers-store';
+import { applyFilters } from './supabase-filter-converter';
 
 export type ServerColumn = keyof Server;
 
-export interface FilterArray {
-    inclusive: boolean;
-    values: string[];
-}
+// export interface FilterArray {
+//     inclusive: boolean;
+//     values: string[];
+// }
 
-export interface Filter {
-    status: boolean | 'unknown' | null;
-    countries: FilterArray | null;
-    identity: string | null;
-    infoPageAvailable: boolean | null;
-    host: string | null;
-    protocol: 'smp' | 'xftp' | null;
-    uptime7: number | null;
-    uptime30: number | null;
-    uptime90: number | null;
-    uuids: FilterArray | null;
-}
+// export interface Filter {
+//     status: boolean | 'unknown' | null;
+//     countries: FilterArray | null;
+//     identity: string | null;
+//     infoPageAvailable: boolean | null;
+//     host: string | null;
+//     protocol: 'smp' | 'xftp' | null;
+//     uptime7: number | null;
+//     uptime30: number | null;
+//     uptime90: number | null;
+//     uuids: FilterArray | null;
+// }
 
-export type SortField = 'status' | 'host' | 'identity' | 'country' | 'type' | 'uptime7' | 'uptime30' | 'uptime90' | 'lastCheck';
-export type SortOrder = 'asc' | 'desc';
+// export type SortField = 'status' | 'host' | 'identity' | 'country' | 'type' | 'uptime7' | 'uptime30' | 'uptime90' | 'lastCheck';
+// export type SortOrder = 'asc' | 'desc';
 
-export interface Sort {
-    field: SortField;
-    order: SortOrder;
-}
+// export interface Sort {
+//     field: SortField;
+//     order: SortOrder;
+// }
 
 const parseServer = function (data: any): Server {
     return {
@@ -52,6 +54,26 @@ export class ServersService {
     constructor(client: SupabaseClient, store: ServersStore) {
         this.client = client;
         this.store = store;
+    }
+
+    async fetchQuery(filter: any, pageSize: number, pageNumber: number) {
+        let query = this.client.from('servers_view').select('*', { count: 'exact' });
+
+        query = applyFilters(query, filter);
+
+        const start = pageSize * (pageNumber - 1);
+        query = query.range(start, start + pageSize - 1);
+
+        const { data, error, count } = await query;
+
+        if (error) throw error;
+
+        const servers = data.map(parseServer);
+
+        this.store.addOrUpdate(...servers);
+        count && this.store.totalCount.set(count);
+
+        return servers.map(({ uuid }) => uuid);
     }
     
     async fetch (filter: Filter, sort: Sort, pageSize: number, pageNumber: number): Promise<string[]> {

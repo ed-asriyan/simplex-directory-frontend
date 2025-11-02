@@ -16,7 +16,7 @@ interface FilterGroup {
   rules: (FilterRule | FilterGroup)[];
 }
 
-type FilterValue = FilterGroup;
+export type FilterValue = FilterGroup | {};
 
 /**
  * Helper to check if a rule is a group

@@ -2,7 +2,7 @@ import { computed, type ReadableAtom } from 'nanostores';
 import { AbstractStore } from './abstract-store';
 
 export interface Country {
-    country: string
+    country: string;
     active: number;
     inactive: number;
 }

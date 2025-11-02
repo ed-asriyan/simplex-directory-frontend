@@ -24,9 +24,9 @@
     const serverStatusesStore = new ServerStatusesStore();
     const serverStatusesService = new ServerStatusesService(supabase, serverStatusesStore);
 
-    onMount(() => {
-        countriesService.fetchCountries();
-    })
+    const init = async function () {
+        await countriesService.fetchCountries();
+    };
 
     const addServerClick = async function () {
         const input = prompt('Enter SMP or XFTP server URI:')?.trim();
@@ -44,60 +44,72 @@
 
 <GithubCorner />
 
-<div class="uk-section uk-section-secondary uk-section-xsmall uk-text-center uk-padding-remove-bottom">
-    <div class="uk-container uk-container-expand">
-        <Sponsors />
+{#await init()}
+    <div uk-spinner="ratio: 3" class="loader"></div>
+{:then _} 
+    <div class="uk-section uk-section-secondary uk-section-xsmall uk-text-center uk-padding-remove-bottom">
+        <div class="uk-container uk-container-expand">
+            <Sponsors />
+        </div>
     </div>
-</div>
+    <div class="uk-section uk-section-secondary uk-padding-remove-bottom uk-padding-remove-top">
+        <div class="uk-container uk-text-center">
+            <h1 class="uk-heading-small">Unofficial <a href="https://simplex.chat" target="_blank" class="uk-link-text">SimpleX</a> Directory</h1>
+        </div>
 
-<div class="uk-section uk-section-secondary uk-padding-remove-bottom uk-padding-remove-top">
-    <div class="uk-container uk-text-center">
-        <h1 class="uk-heading-small">Unofficial <a href="https://simplex.chat" target="_blank" class="uk-link-text">SimpleX</a> Directory</h1>
+        <div class="uk-container uk-text-center uk-margin-top">
+            <div>
+                Discover and share community-run <a href="https://simplex.chat/docs/server.html#overview" target="_blank">SMP</a> and <a href="https://simplex.chat/docs/xftp-server.html#overview" target="_blank">XFTP</a> servers.
+                <br/>
+                Here anyone can anonymously add servers to the public list. The availability of each server is checked periodically.
+            </div>
+        </div>
+
+        <div class="uk-container uk-text-center uk-margin-top">
+            <button class="uk-button uk-button-default uk-margin-left uk-margin-remove-right" onclick={addServerClick}>Add server anonymously</button>
+        </div>
+
+        <div class="uk-container uk-margin-medium-top">
+            <Stats {countriesStore} />
+        </div>
+
+        <p class="uk-text-muted uk-text-center uk-margin-bottom">
+            <u><a href={simplexGroupLink} target="_blank" class="uk-link-text uk-text-muted">Join the SimpleX group chat</a></u>
+        </p>
     </div>
 
-    <div class="uk-container uk-text-center uk-margin-top">
-        <div>
-            Discover and share community-run <a href="https://simplex.chat/docs/server.html#overview" target="_blank">SMP</a> and <a href="https://simplex.chat/docs/xftp-server.html#overview" target="_blank">XFTP</a> servers.
-            <br/>
-            Here anyone can anonymously add servers to the public list. The availability of each server is checked periodically.
+    <div class="uk-section uk-section-default">
+        <div class="uk-container uk-container-expand">
+            <ServersTable {serversService} {serversStore} {countriesStore} {serverStatusesStore} {serverStatusesService} />
         </div>
     </div>
 
-    <div class="uk-container uk-text-center uk-margin-top">
-        <button class="uk-button uk-button-default uk-margin-left uk-margin-remove-right" onclick={addServerClick}>Add server anonymously</button>
+    <div class="uk-section uk-section-secondary uk-text-small uk-text-muted uk-text-center">
+        <div class="uk-margin-top">
+            The website is not affiliated with the SimpleX team. Content is contributed by anonymous users.
+            <br />
+            Servers that have been inactive for 90 days or more may be removed from the directory.
+        </div>
+        <div class="uk-margin-top">
+            <span>Powered by</span>
+            · <a class="uk-text-muted" href="https://simplex.chat" target="_blank">SimpleX</a>
+            · <a class="uk-text-muted" href="https://svelte.dev" target="_blank">Svelte</a>
+            · <a class="uk-text-muted" href="https://supabase.com" target="_blank">Supabase</a>
+            · <a class="uk-text-muted" href="https://getuikit.com" target="_blank">UIkit</a>
+            · <a class="uk-text-muted" href="https://icons8.com" target="_blank">Icons8</a>
+        </div>
+        <div class="uk-margin-top">
+            <a class="uk-text-muted" href="https://asriyan.me" target="_blank">Ed Asriyan</a>
+        </div>
     </div>
+{/await}
 
-    <div class="uk-container uk-margin-medium-top">
-        <Stats {countriesStore} />
-    </div>
-
-    <p class="uk-text-muted uk-text-center uk-margin-bottom">
-        <u><a href={simplexGroupLink} target="_blank" class="uk-link-text uk-text-muted">Join the SimpleX group chat</a></u>
-    </p>
-</div>
-
-<div class="uk-section uk-section-default">
-    <div class="uk-container uk-container-expand">
-        <ServersTable {serversService} {serversStore} {countriesStore} {serverStatusesStore} {serverStatusesService} />
-    </div>
-</div>
-
-<div class="uk-section uk-section-secondary uk-text-small uk-text-muted uk-text-center">
-    <div class="uk-margin-top">
-        The website is not affiliated with the SimpleX team. Content is contributed by anonymous users.
-        <br />
-        Servers that have been inactive for 90 days or more may be removed from the directory.
-    </div>
-    <div class="uk-margin-top">
-        <span>Powered by</span>
-        · <a class="uk-text-muted" href="https://simplex.chat" target="_blank">SimpleX</a>
-        · <a class="uk-text-muted" href="https://svelte.dev" target="_blank">Svelte</a>
-        · <a class="uk-text-muted" href="https://supabase.com" target="_blank">Supabase</a>
-        · <a class="uk-text-muted" href="https://getuikit.com" target="_blank">UIkit</a>
-        · <a class="uk-text-muted" href="https://icons8.com" target="_blank">Icons8</a>
-    </div>
-    <div class="uk-margin-top">
-        <a class="uk-text-muted" href="https://asriyan.me" target="_blank">Ed Asriyan</a>
-    </div>
-</div>
-
+<style lang="scss">
+    .loader {
+        width: 100dvw;
+        height: 100dvh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>

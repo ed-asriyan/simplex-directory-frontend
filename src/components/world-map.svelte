@@ -210,7 +210,7 @@
 <svg bind:this={svgElement} viewBox={`0 0 ${width} ${height}`}></svg>
 {#if toolTip}
     <div class="tooltips" style={`top: ${toolTip.top}px; left: ${toolTip.left}px;`}>
-        <b><LineCountry country={toolTip.country} /></b>
+        <b><LineCountry country={toolTip.country} /> ({toolTip.country})</b>
         <div class="uk-text">{toolTip.text}</div>
     </div>
 {/if}
