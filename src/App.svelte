@@ -2,6 +2,7 @@
     import 'uikit/dist/js/uikit';
     import Analytics from './analytics.svelte';
     import Page from './components/index.svelte';
+    import OfflineBanner from './components/offline-banner.svelte';
     import { environment, isProduction } from './settings';
     import './app.scss';
 </script>
@@ -15,3 +16,5 @@
 {/if}
 
 <Page />
+
+<OfflineBanner />
